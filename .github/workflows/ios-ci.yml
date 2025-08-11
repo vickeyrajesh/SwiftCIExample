@@ -1,18 +1,45 @@
+name: iOS CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
 jobs:
-  build:
-    runs-on: macos-15     # Ensures newer Xcode support
+  build-and-test:
+    runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v4
+    # 1️⃣ Get the code
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Set up Xcode 16.4
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '16.4'
+    # 2️⃣ Select Xcode version
+    - name: Select Xcode
+      run: sudo xcode-select -switch /Applications/Xcode_16.4.app
 
-      - name: Build & Test
-        run: |
-          xcodebuild clean test \
-            -project SwiftCIExample.xcodeproj \
-            -scheme SwiftCIExample \
-            -destination 'platform=iOS Simulator,name=iPhone 15'
+    # 3️⃣ List available simulators (debugging step)
+    - name: List available simulators
+      run: xcrun simctl list devices
+
+    # 4️⃣ Build without code signing
+    - name: Build project
+      run: |
+        xcodebuild \
+          -scheme SwiftCIExample \
+          -sdk iphonesimulator \
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5' \
+          CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+          build
+
+    # 5️⃣ Run unit tests
+    - name: Run tests
+      run: |
+        xcodebuild \
+          -scheme SwiftCIExample \
+          -sdk iphonesimulator \
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.5' \
+          CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO \
+          test
