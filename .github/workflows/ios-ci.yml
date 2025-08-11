@@ -1,31 +1,18 @@
-name: iOS CI (Build & Test)
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
 jobs:
-  build-test:
-    runs-on: macos-latest
+  build:
+    runs-on: macos-15     # Ensures newer Xcode support
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select Xcode
-        run: sudo xcode-select -switch /Applications/Xcode.app
+      - name: Set up Xcode 16.4
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
 
-      - name: Build
+      - name: Build & Test
         run: |
-          xcodebuild clean build \
-            -project SwiftCIExample.xcodeproj \
-            -scheme SwiftCIExample \
-            -destination 'platform=iOS Simulator,name=iPhone 15'
-
-      - name: Run Tests
-        run: |
-          xcodebuild test \
+          xcodebuild clean test \
             -project SwiftCIExample.xcodeproj \
             -scheme SwiftCIExample \
             -destination 'platform=iOS Simulator,name=iPhone 15'
