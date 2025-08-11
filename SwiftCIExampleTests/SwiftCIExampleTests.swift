@@ -29,6 +29,10 @@ final class SwiftCIExampleTests: XCTestCase {
     func testAddition() {
         XCTAssertEqual(2 + 2, 4)
     }
+    
+    func testAddition1() {
+        XCTAssertEqual(2 + 2, 4)
+    }
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
